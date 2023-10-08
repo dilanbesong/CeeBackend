@@ -15,7 +15,7 @@ import bodyParser from "body-parser";
 const connectedUsers = []
 //const activeFriends = []
 
-const MONGO_URI = "mongodb://localhost:27017/CEEDB" || process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
 mongoose.connect(MONGO_URI)
 
 
