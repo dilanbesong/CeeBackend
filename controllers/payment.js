@@ -32,6 +32,7 @@ const makePayment = async (req, res ) => {
          ).user._id;
          const { regNumber, refNumber, amount, level } = req.body
          const user = await User.findById(myId)
+
          const departMentalFee = 5700 
          if( parseFloat(amount) !== departMentalFee ) {
            return res.send({msg:`Amount must be equall to N${departMentalFee}`})      
@@ -45,9 +46,28 @@ const makePayment = async (req, res ) => {
         if( user.level == 500) return res.status(200).send({ msg: "Payment Successfull !" }); 
          user.level += 100
          await user.save()
+         console.log(newReceipt);
          return res.status(200).send({msg:'Payment Successfull !'})      
      } catch (error) {
          return res.send({ msg: error.message })         
      }             
 }
-export { getReciepts, makePayment }
+
+const searchPayments = async(req, res) => {
+   try {
+      const { refNumber } = req.params
+      const payments = await Payment.find()
+      let searchPaymentResults = []
+      searchPaymentResults = payments.filter( payment => {
+        return payment.refNumber.includes(refNumber)
+      })
+      const payList = searchPaymentResults.map(student => {
+         return student.regNumber
+      })
+      const payers = await User.find({ regNumber:{ $inc: payList } })
+      return res.status(200).send(payers)
+   } catch (error) {
+       return res.send({ msg: error.message }); 
+   }
+}
+export { getReciepts, makePayment, searchPayments }

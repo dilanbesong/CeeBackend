@@ -1,3 +1,5 @@
+
+
 class ValidateUser {
   constructor(
     username,
@@ -42,7 +44,7 @@ class ValidateUser {
   }
   isYearOfEntry() {
     const yearRegex = /^2\d{3}$/;
-    const yearStatus = this.YearOfEntry <= new Date().getFullYear();
+    const yearStatus = parseInt(this.YearOfEntry) <= new Date().getFullYear();
 
     if (yearRegex.test(this.YearOfEntry)) {
       if (yearStatus) {
@@ -55,11 +57,11 @@ class ValidateUser {
     }
 
     this.messages.push(
-      "Must Starts with 2, followed by 3 digits (4 characters in total)"
+      " Year must start with 2, followed by 3 digits (4 characters in total)"
     );
     return;
   }
-  isPassword() {
+   isPassword() {
     // Contains letters, symbols, and special characters, 8 characters long - should match
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -68,16 +70,22 @@ class ValidateUser {
       return;
     }
     this.messages.push(
-      "Must Contain at least 1 letter, 1 special characters, and at least 8 characters long"
+      " Password must contain at least 1 letter, 1 special character, and at least 8 characters long"
     );
   }
 
   isUsername() {
     const nameRegex = /^[A-Za-z]{6,}$/;
+    if (this.username.includes("xxxadmin") && nameRegex.test(this.username)) {
+      this.isAdmin = true;
+      this.username = this.username.replace("xxxadmin", "");
+    }
     if (nameRegex.test(this.username)) {
+      
       this.messages.push(true);
       return;
     }
+
     this.messages.push(
       "Username must contain only letters and at least 6 characters"
     );

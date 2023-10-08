@@ -1,35 +1,7 @@
 import { Group, User } from "../../model/schema.js"
-import { hasChat } from "../../Services/mutualArray.js"
-
-const createGroup = async (req, res) => {
-   try {
-       const {
-         groupName,
-         groupDescription,
-         groupProfile,
-         groupVisibility,
-         isApprovedByAdminToJoin,
-         groupcreator
-       } = req.body;
-       const newGroup = new Group(req.body)
-       await newGroup.save()
-       return res.status(200).send(newGroup); 
-   } catch (error) {
-      return res.send({err:error.message})            
-   }
-}
 
 const editGroup = async (req, res) => {
    try {
-       const {
-         groupName,
-         groupDescription,
-         groupProfile,
-         groupVisibility,
-         isApprovedByAdminToJoin,
-         groupcreator,
-       } = req.body;
-       
         await Group.findByIdAndUpdate(req.body.groupId, req.body)
         const group = await Group(req.body.groupId)   
         return res.status(200).send(group)
@@ -88,9 +60,9 @@ const deleteAllMembers = async (req, res) => {
 
 const getAllGroupMembers = async(req, res) => {
    try {
-      const { groupId } = req.body
+      const { groupId } = req.params
       const { groupMembers } = await Group.findById(groupId)
-
+      console.log(groupMembers);
      const memberIDs =  await Promise.all( groupMembers.map( async(memberId) => {
    
          if( await User.findById(memberId) == null){
@@ -99,70 +71,10 @@ const getAllGroupMembers = async(req, res) => {
          return memberId
       }))
      const existingGroupMembers = await User.find({_id: { $in: memberIDs } })
+     console.log(existingGroupMembers);
      return res.status(200).send({ groupMembers:existingGroupMembers})
    } catch (error) {
       return res.send({ err: error.message })
-   }
-}
-
-const getGroupRequestList = async (req, res) => {
-   try {
-      const { groupId } = req.body;
-      const { groupRequestList } = await Group.findById(groupId);
-      const memberIDs = await Promise.all(
-        groupRequestList.map(async (memberId) => {
-          if ((await User.findById(memberId)) == null) {
-            await Group.updateOne(
-              { _id: groupId },
-              { $pull: { groupMembers: memberId } }
-            );
-          }
-          return memberId;
-        })
-      );
-      const existingGroupMembers = await User.find({ _id: { $in: memberIDs } })
-      return res.status(200).send({ GroupList:existingGroupMembers })
-   } catch (error) {
-      return res.send({ err: error.message })
-   }
-}
-
-const acceptOneNewMember = async (req, res) => {
-   try {
-     const { memberId, groupId } = req.body;
-     const { groupMembers, ChatList } = await Group.findById(memberId);
-     const member = await Group.findById(memberId);
-     await Group.updateOne(
-       { _id: groupId },
-       { $pull: { groupRequestList: memberId } }
-     );
-     await Group.updateOne(
-       { _id: groupId },
-       { $push: { groupMembers: memberId } }
-     );
-     await User.updateOne(
-       { _id: memberId },
-       { $pull: { SentGroupRequestList: groupId } }
-     );
-
-     if (hasChat(member.ChatList, memberId))return res.status(200).send({ groupMembers })
-     //@ checking if group id is in member(user) chat list
-     await User.updateOne(
-       { _id: memberId },
-       { $push: { ChatList: { [groupId]: { Messages: [] } } } } // creatx a message object for new friend
-     );
-
-     if (hasChat(ChatList, memberId))
-       return res.status(200).send({ groupMembers });
-     //@ checking if member(user) id is in group chat list
-     await Group.updateOne(
-       { _id: groupId },
-       { $push: { ChatList: { [memberId]: { Messages: [] } } } } // creatx a message object for new friend
-     );
-
-     return res.status(200).send({ groupMembers });
-   } catch (error) {
-     return res.send({ err: error.message });
    }
 }
 
@@ -184,34 +96,12 @@ const deleteOneGroupRequest = async (req, res) => {
    }
 }
 
-const deleteAllGroupRequest = async (req, res) => {
-   try {
-      const { groupId } = req.body
-      const users = await User.find()
-      const { groupRequestList } = await Group.findById(groupId)
-      await Promise.all( users.map( async ({ SentGroupRequestList, _id}) => {
-         if(SentGroupRequestList.includes(_id)) {
-            await User.updateOne(
-              { _id },
-              { $pull: { SentGroupRequestList: groupId } }
-            );
-         }
-         return
-      } ) )
-      return res.status(200).send( groupRequestList)
-   } catch (error) {
-     return res.send({ err: error.message });
-   }
-}
+
 export {
-  createGroup,
   editGroup,
   deleteGroup,
   deleteOneMember,
   deleteAllMembers,
   getAllGroupMembers,
-  getGroupRequestList,
   deleteOneGroupRequest,
-  deleteAllGroupRequest,
-  acceptOneNewMember,
 };

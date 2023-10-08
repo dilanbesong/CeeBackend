@@ -3,7 +3,7 @@ const isAuth = ( req, res, next) => {
       next()
       return
    } 
-   return res.send('Unauthorise!!')
+   return res.status(404).send({ errMessage:'Unauthorise' })
 
 }
 

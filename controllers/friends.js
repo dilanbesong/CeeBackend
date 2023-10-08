@@ -1,14 +1,15 @@
-import { User, Notification } from '../model/schema.js'
+import { User, Notification, Chat } from '../model/schema.js'
 import { hasChat } from '../Services/mutualArray.js';
 import jwt from 'jsonwebtoken'
 
 
 const getMyFriendList = async (req, res) => {
   try {
-    const userId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    const userId = req.params.userId
+    // const userId = await jwt.verify(
+    //   req.session.userToken,
+    //   process.env.JWT_SECRETE
+    // ).user._id;
 
     const { FriendList } = await User.findById(userId);
     if (FriendList.length == 0) return res.send({ Friends: [] });
@@ -43,24 +44,25 @@ const sendFriendOneRequest = async (req, res) => {
 
    const user = await User.findById(myId)
    const friend = await User.findById(friendId)
-    console.log(user);
-    console.log(friend);
+
    if (
      user.SentFriendRequestList.includes(friendId) ||
      friend.FriendRequestList.includes(myId)
    ) return res.send({ msg:'You have already made a request'})
-
-
+    
+     
+     await User.updateOne(
+       { _id: myId },
+       { $push: { SentFriendRequestList: friendId } }
+     );
+    
      await User.updateOne(
        { _id: friendId },
        { $push: { FriendRequestList: myId } }
      );
-    await User.updateOne(
-      { _id: myId },
-      { $push: { SentFriendRequestList: friendId } }
-    );
-    const { FriendRequestList } = await User.findById(myId);
-    return res.status(200).send({ FriendRequestList });
+    
+    
+    return res.status(200).send({ msg:'Your request has been sent!' });
   } catch (error) {
     return res.status(500).send({ err: error.message });
   }
@@ -68,43 +70,75 @@ const sendFriendOneRequest = async (req, res) => {
 
 const acceptOneFriendRequest = async ( req, res) => {
     try {
-      const { friendId } = req.body
-      const myId = await jwt.verify(
-        req.session.userToken,
-        process.env.JWT_SECRETE
-      ).user._id;
+      const { friendId, myId } = req.body
     
-       await User.updateOne(
-         { _id: myId },
-         { $push: { FriendList: friendId  } } // addx to friend list
-       );
-       await User.updateOne(
-         { _id: myId },
-         { $pull: { FriendRequestList: friendId } } // pullx from friend request list
-       );
-       await User.updateOne(
-         { _id: friendId },
-         { $pull: { SentFriendRequestList: myId } } // pullx from my friend sent request list
-       );
+        
+        const friend = await User.findById(friendId);
+        const user = await User.findById(myId)
 
-       await User.updateOne(
-         { _id: friendId },
-         { $push: { ChatList:{ [myId]:{ Messages:[] } } } } // creatx a message object for new friend
-       );
-       await User.updateOne(
-         { _id: myId },
-         { $push: { ChatList: { [friendId]: { Messages: [] } } } } // creatx a message object for new friend
-       );
-     const { FriendList, ChatList } = await User.findById(friendId)
-
-      if (hasChat(ChatList, friendId)) return res.status(200).send({ Friends: FriendList });
         await User.updateOne(
           { _id: myId },
-          { $push: { ChatList: { [friendId]: { Messages: [] } } } } // creatx my own message object
+          { $pull: { FriendRequestList: friendId } } // pullx friend from friend request list
+        );
+        await User.updateOne(
+          { _id: friendId },
+          { $pull: { SentFriendRequestList: myId } } // pullx myself from my friend sent request list
         );
 
+        async function addNewFriend(){
+          await User.updateOne(
+            { _id: friendId },
+            { $push: { FriendList: myId } } // addx myself to my friends friendlist
+          );
+          await User.updateOne(
+            { _id: myId },
+            { $push: { FriendList: friendId } } // addx friend to my friend list
+          );
+        }
+
+        async function createChatIDForWeBoth() {
+          const chatList1 = new Chat({ friendId, myId })
+          const chatList2 = new Chat({ friendId, myId });
+          await chatList1.save()
+          await chatList2.save()
+          await User.updateOne(
+            { _id: friendId },
+            { $push: { ChatList: { memberId:myId, chatId:chatList1._id } } }// addx me(you) as message object for new friend
+          );
+          await User.updateOne(
+            { _id: myId },
+            { $push: { ChatList: { memberId:friendId, chatId: chatList2._id } } } // adding friend as message object for me(you)
+          );
+        }
+
        
-       return res.status(200).send({ Friends:FriendList })
+        
+        if(hasChat( user.ChatList, friendId) && hasChat(friend.ChatList, myId) == false){
+          const chatList = new Chat({ friendId, myId });
+          await chatList.save()
+          await User.updateOne(
+            { _id: friendId },
+            { $push: { ChatList: { memberId: myId, chatId: chatList._id } } } // addx me(you) as message object for new friend
+          );
+           addNewFriend();
+           return res.status(200).send({ Friends: user.FriendList, friendId }); 
+        }
+
+        else if( hasChat(friend.ChatList, myId) &&  hasChat(user.ChatList, friendId) == false){
+          const chatList = new Chat({ friendId, myId });
+          await chatList.save()
+          await User.updateOne(
+            { _id: myId },
+            { $push: { ChatList: { memberId:friendId, chatId: chatList._id } } } // adding friend as message object for me(you)
+          );
+          addNewFriend();
+          return res.status(200).send({ Friends: user.FriendList, friendId }); 
+        }
+        
+           createChatIDForWeBoth();
+           addNewFriend();
+           return res.status(200).send({ Friends: user.FriendList, friendId }); 
+        
     } catch (error) {
       return res.status(500).send({ err: error.message })
     }
@@ -113,12 +147,14 @@ const acceptOneFriendRequest = async ( req, res) => {
 
 const rejectOneFriendRequest = async (req, res) => {
   try {
-      const { friendId } = req.body
-      const myId = await jwt.verify(
-        req.session.userToken,
-        process.env.JWT_SECRETE
-      ).user._id;
+      const { friendId, myId } = req.body
+      
+      // const myId = await jwt.verify(
+      //   req.session.userToken,
+      //   process.env.JWT_SECRETE
+      // ).user._id;
 
+     const { FriendRequestList } = await User.findById(myId);
       await User.updateOne(
         { _id:myId },
         { $pull: { FriendRequestList: friendId } }
@@ -127,9 +163,13 @@ const rejectOneFriendRequest = async (req, res) => {
         { _id: friendId },
         { $pull: { SentFriendRequestList:myId } }
       );
+      
 
-      const { FriendRequestList } = await User.findById(myId);
-      return res.send({ msg: "Rejected Friend Request", FriendRequestList });
+      if(!FriendRequestList.includes(friendId)){
+         return res.send({ msg: "Rejected Friend Request", FriendRequestList });
+      }
+      return res.send({ msg: "Unable to delete requests please try again later !!"});
+      
       
   } catch (error) {
     return res.status(500).send({ err: error.message });
@@ -138,18 +178,20 @@ const rejectOneFriendRequest = async (req, res) => {
 
 const getMyFriendRequestList = async (req, res) => {
   try {
-    const myId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    // const myId = await jwt.verify(
+    //   req.session.userToken,
+    //   process.env.JWT_SECRETE
+    // ).user._id;
+    const myId = req.params.myId
     const { FriendRequestList } = await User.findById(myId);
-    if (FriendRequestList.length == 0) return res.send({ friendRequest: [] });
+  
+   // if (FriendRequestList.length == 0) return res.send({ friendRequest: [] });
 
     const getFriendRequest = await Promise.all(
       FriendRequestList.map(async (friendId) => {
         if ((await User.findById(friendId)) == null) {
           await User.updateOne(
-            { _id: memberId },
+            { _id: myId },
             { $pull: { FriendRequestList: friendId } }
           );
         }
@@ -165,7 +207,7 @@ const getMyFriendRequestList = async (req, res) => {
 
 const deleteOneFriend = async ( req, res) => {
      try {
-      const { friendId } = req.body;
+      const { friendId } = req.params;
       const myId = await jwt.verify(
         req.session.userToken,
         process.env.JWT_SECRETE
@@ -209,16 +251,17 @@ const deleteAllFriends = async (req, res) => {
    
     return res.send({ Friends:user.FriendList})
   } catch (error) {
-    return res.send({ msg: error.message })
+    return res.send({ error: error.message })
   }
 }
 
 const getAllmySentFriendRequest = async ( req, res) => {
   try {
-     const myId = await jwt.verify(
-       req.session.userToken,
-       process.env.JWT_SECRETE
-     ).user._id;
+    const myId = req.params.myId
+    //  const myId = await jwt.verify(
+    //    req.session.userToken,
+    //    process.env.JWT_SECRETE
+    //  ).user._id;
      
      const { SentFriendRequestList } = await User.findById(myId)
      const pendingFriendIDs = await Promise.all( SentFriendRequestList.map( async( friendId) => {
@@ -257,7 +300,7 @@ const cancelOneSentFriendRequest = async (req, res) => {
 
    const { SentFriendRequestList } = await User.findById(myId)
 
-  return res.status(200).send({ SentFriendRequestList })
+  return res.status(200).send({ friendId })
   } catch (error) {
     return res.send({ msg: error.message });
   }
@@ -277,6 +320,8 @@ const cancelAllSentFriendRequest = async (req, res) => {
      return res.send({ msg: error.message })
    }
 }
+
+
 
 
 export {

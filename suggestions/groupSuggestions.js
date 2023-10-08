@@ -1,6 +1,6 @@
-import { Group } from "../model/schema.js";
+import { Group, User } from "../model/schema.js";
 import jwt from "jsonwebtoken";
-import { compareArr } from "../Services/.js";
+import { compareArr } from "../Services/mutualArray.js";
 import { shuffleArray } from "../Services/shuffle.js";
 
 const groupSuggestions = async ( req, res ) => {
@@ -26,9 +26,6 @@ const groupSuggestions = async ( req, res ) => {
            getSuggestions.push(group);
          }else if(compareArr(user.FriendRequestList, group.groupMembers)){
            /* @sugg base on those who sent me a friend Request */
-           getSuggestions.push(group);
-         }else if(group.vistorsList.includes(user._id)) {
-           /* @sugg if i have visited the group but not a group member */
            getSuggestions.push(group);
          }else if( compareArr(user.SentFriendRequestList, group.groupMembers) ){
            /* @sugg base on those i have sent a Friend who are group members */

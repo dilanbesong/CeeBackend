@@ -1,3 +1,4 @@
  
- let connectedUsers = { connectedClients:new Array() }
+ let connectedUsers = new Array()
+ //{ connectedClients:new Array() }
  export { connectedUsers }

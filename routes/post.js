@@ -1,27 +1,45 @@
 import express from 'express'
-import { Post, Group } from '../model/schema.js';
 import {
   createPost,
   editPost,
   viewPost,
   deletePost,
-  getPosts,
+  getMyPosts,
   searchPost,
   getStatusPost,
+  Postviews,
+  likePost,
+  getPoster,
   searchGroupsAndFriends,
+  getAllPost,
+  sequenciallyFetchPost,
 } from "../controllers/post.js";
 import { isAuth } from '../middlewears/isAuth.js'
 import { isPoster } from "../middlewears/isPoster.js"
+import { friendsSuggestions } from '../suggestions/friendSuggestions.js';
+import { groupSuggestions } from '../suggestions/groupSuggestions.js';
+
 const router = express.Router()
 
 router
-  .get("/getPosts", isAuth, getPosts)
-  .get("/viewPost", isAuth, viewPost)
+  .get("/getMyPosts/:userId", isAuth, getMyPosts) // getting my own posts
+  .get("/getAllPost", isAuth, getAllPost) // all/general post
+  .get(
+    "/sequenciallyFetchPost/:skipCount/:postLimit",
+    isAuth,
+    sequenciallyFetchPost
+  )
+  .post("/viewPost", isAuth, viewPost)
+  .post("/likePost", isAuth, likePost)
+  .post("/numberOFviews", isAuth, Postviews)
   .get("/getStatusPost", isAuth, getStatusPost)
-  .get("/searchGroupsAndFriends/query=?searchWord", isAuth, searchGroupsAndFriends)
+  .get("/getPoster/:posterId", isAuth, getPoster)
+  .get("/searchGroupsAndFriends/:searchWord", isAuth, searchGroupsAndFriends)
+  .get("/searchPost/:searchWord", isAuth, searchPost)
+  .get("/friendSuggestions", isAuth, friendsSuggestions)
+  .get("/groupSuggestions", isAuth, groupSuggestions)
   .post("/createPost", isAuth, createPost)
-  .post("/searchPost", isAuth, searchPost)
   .put("/editPost", isAuth, editPost)
-  .delete("/deletePost", isAuth, deletePost);
+  .delete("/deletePost/:postId/:poster", isAuth, deletePost);
 
 export default router

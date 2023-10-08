@@ -17,6 +17,7 @@ const validateCredencials = ( req, res, next) => {
      password,
      PhoneNumber,
    } = req.body;
+
    const user = new ValidateUser(
      username,
      email,
@@ -27,13 +28,14 @@ const validateCredencials = ( req, res, next) => {
      password,
      PhoneNumber
    );
-   
+   //console.log(user);
    user.isYearOfEntry();
    user.isEmail();
    user.isPassword();
    user.isRegNumber();
    user.isUsername();
    user.isPhoneNumber();
+
    let msg = undefined;
    for (const str of user.messages) {
      if (typeof str == "string") {
@@ -43,6 +45,7 @@ const validateCredencials = ( req, res, next) => {
    if( typeof msg == 'string'){
       return res.send({errorMessage: msg})
    }else {
+      req.body = user
       next()
    }
    
@@ -65,7 +68,7 @@ const isExist = async ( req, res, next) => {
         
                  
      } catch (error) {
-        return res.send({msg:error.message})          
+        return res.send({errorMessage:error.message})          
      }
 }
 
@@ -80,7 +83,7 @@ const validateAdmin = async (req, res, next) => {
     if(!validateAdmin.isPassword()) return res.send({msg:'Invalid password'})
     next()
  } catch (error) {
-    return res.send({ msg: error.message })
+    return res.send({errorMessage: error.message })
  }
 }
 

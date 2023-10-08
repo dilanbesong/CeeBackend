@@ -1,17 +1,21 @@
 import { model, Schema } from "mongoose";
 
-
 const userSchema = new Schema(
   {
     username: String,
     password: String,
-    profileImage: String,
     PhoneNumber: String,
-    YearOfEntry: { type: String, default: "adminYear" },
-    regNumber: { type: String, default: "adminRegNumber" },
-    location: {
+    YearOfEntry: String,
+    regNumber: String,
+    profileImage: {
+      default:
+        "https://tse3.mm.bing.net/th?id=OIP.ruat7whad9-kcI8_1KH_tQHaGI&pid=Api&P=0&h=220",
       type: String,
-      default: "{ log:'', lat:''}",
+    },
+    backgroundProfile: {
+      default:
+        "https://tse3.mm.bing.net/th?id=OIP.TmFdrhMS6gzhI-ACF3977wHaF2&pid=Api&P=0&h=220",
+      type: String,
     },
     isAdmin: {
       type: Boolean,
@@ -44,7 +48,6 @@ const userSchema = new Schema(
     },
 
     DepartmentalFees: [],
-    vistorsList: [],
     Posts: [],
     SearchList: [],
     FriendRequestList: [],
@@ -58,16 +61,14 @@ const userSchema = new Schema(
   { timestamps: {} }
 );
 
-
 const postSchema = new Schema(
   {
     body: { type: String, default: "" },
     postType: { type: String, default: "post" }, // post, status
     poster: { type: String, default: "CEE" },
-    postStatus: { type: String, default: "public" },
     views: { type: Number, default: 0 },
-    category:{ type:String, default:'all'},
-    postFiles: [],
+    category: { type: String, default: "all" },
+    fileList: [],
     Likes: [],
     Comments: [],
   },
@@ -76,10 +77,10 @@ const postSchema = new Schema(
 
 const commentSchema = new Schema(
   {
-    commenterorId: String,
+    commentorId: String,
     body: String,
     Likes: [],
-    Replies: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
+    Replies: [],
   },
   { timestamps: {} }
 );
@@ -88,8 +89,18 @@ const groupSchema = new Schema(
   {
     groupName: String,
     groupDescription: String,
-    groupProfile: String,
-    groupcreator:{ type:String, default:'CEE'},
+    groupProfile: {
+      type: String,
+      default:
+        "https://tse1.mm.bing.net/th?id=OIP.QxsVsurnuz5IpPrRtTqJGwHaHa&pid=Api&P=0&h=220",
+    },
+    isBlocked: { type: Boolean, default: false },
+    groupcreator: { type: String, default: "CEE" },
+    groupBackgroundProfile: {
+      type: String,
+      default:
+        "https://tse1.explicit.bing.net/th?id=OIP.O4T614rCJAnj7fwRGKTkrAAAAA&pid=Api&P=0&h=220",
+    },
     groupVisibility: {
       type: Boolean,
       default: true,
@@ -99,39 +110,53 @@ const groupSchema = new Schema(
       default: false,
     },
     GroupAdmins: [],
-    vistorsList: [],
     groupPost: [],
     groupMembers: [],
-    ChatList:[],
+    ChatList: [],
     groupRequestList: [],
   },
   { timestamps: {} }
 );
 
-const paymentSchema = new Schema({
-   amount:String,
-   regNumber:String,
-   refNumber:String,
-   level:String,
-}, { timestamps: {} });
+const paymentSchema = new Schema(
+  {
+    amount: String,
+    regNumber: String,
+    refNumber: Schema.Types.Mixed,
+    level: String,
+    Year:{ type:String, default:new Date().getFullYear().toString() }
+  },
+  { timestamps: {} }
+);
 
 const notificationSchema = new Schema(
   {
     message: String,
-    notificatorId:String
+    notificatorId: String,
   },
   { timestamps: {} }
 );
-const messageSchema = new Schema({
-  message:String,
-  messagersId:String
-}, { timestamps: {} });
+const messageSchema = new Schema(
+  {
+    message: String,
+    senderId:String,
+    recieverId:String,
+    timeStamps: {type: Date, default:new Date()}
+  },
+);
 
-const User = model('User', userSchema)
-const Group = model('Group', groupSchema)
-const Post = model('Post', postSchema)
-const Payment = model('Payment', paymentSchema)
-const Notification = model('Notification', notificationSchema)
-const Message = model('Message', messageSchema)
-const Comment =model('Comment', commentSchema)
-export { User, Group, Post, Payment, Notification, Message, Comment }
+const chatListSchema = new Schema( {
+  friendId:String,
+  myId:String,
+  Chats:[]
+})
+
+const User = model("User", userSchema);
+const Group = model("Group", groupSchema);
+const Post = model("Post", postSchema);
+const Payment = model("Payment", paymentSchema);
+const Notification = model("Notification", notificationSchema);
+const Message = model("Message", messageSchema);
+const Comment = model("Comment", commentSchema);
+const Chat = model('Chat', chatListSchema)
+export { User, Group, Post, Payment, Notification, Message, Comment, Chat };

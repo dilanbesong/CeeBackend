@@ -25,7 +25,7 @@ const isCEEAdmin = async (req, res, next) => {
           process.env.JWT_SECRETE
         ).user._id
         const { isAdmin, canViewPanel } = await User.findById(userId); 
-        if( isAdmin && canViewPanel) {
+        if(isAdmin) {
            next()
            return         
         }

@@ -13,16 +13,17 @@ const friendsSuggestions = async (req, res) => {
     const user = await User.findById(myId);
 
     const suggesstedUsers = await User.find({
-      $or: [
+      $and: [
+        {_id: {  $nin:[ myId ]  }  },
         { _id: { $nin: user.FriendList } },
         { _id: { $nin: user.SentFriendRequestList } },
         { _id: { $nin: user.FriendRequestList } },
       ],
     })
-      
+
     const getSuggestions = []
 
-    suggesstedUsers.forEach((suggesstedUser) => {
+    suggesstedUsers.map( user => user._id !== myId ).forEach((suggesstedUser) => {
       if (user.level == suggesstedUser.level) {
         /* @sugguestion base on level */
         getSuggestions.push(suggesstedUser)
@@ -40,9 +41,6 @@ const friendsSuggestions = async (req, res) => {
         getSuggestions.push(suggesstedUser)
       } else if(compareArr(user.SearchList, suggesstedUser.SearchList)){
         /* @sugg base on mutual search */
-        getSuggestions.push(suggesstedUser)
-      } else if(user.vistorsList.includes(suggesstedUser._id)){
-        /* @sugg base on profiles you have visited */
         getSuggestions.push(suggesstedUser)
       }
     });

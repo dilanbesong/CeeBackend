@@ -22,11 +22,11 @@ function getMutual( arr1, arr2){
    }
    return mutualList.length;               
 }
-
+//{ memberId:friendId, chatId: chatList2._id }
 function hasChat(ChatList, friendId) {
   let hasFriendId = false;
   ChatList.forEach((chat) => {
-    if (chat[friendId]) {
+    if (chat.memberId == friendId) {
       hasFriendId = true;
     }
   });

@@ -15,10 +15,12 @@ const getSocketIdByUserId = (userId) => {
 
 
   const Active = (httpServer, userId) => {
-  const io = new Server(httpServer, { cors: { origin: "*", methods:['POST', 'GET'] } })
+  const io = new Server(httpServer, { cors: { origin:'*', methods:['POST', 'GET'] } })
+   // origin:"http://127.0.0.1:5173/";
 
   io.on('connection', (socket) => {
      // console.log("User connected");
+     
       if(getSocketIdByUserId(userId)) return
        connectedClients.push({ sockedId:socket.id, userId })
 

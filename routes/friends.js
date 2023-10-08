@@ -16,11 +16,11 @@ import {
 const router = express.Router()
 
 router
-  .get("/friends", isAuth, getMyFriendList)
-  .get("/myFriendRequest", isAuth, getMyFriendRequestList)
-  .get("/getAllmySentFriendRequest", isAuth, getAllmySentFriendRequest)
+  .get("/friends/:userId", isAuth, getMyFriendList)
+  .get("/myFriendRequest/:myId", isAuth, getMyFriendRequestList)
+  .get("/getAllmySentFriendRequest/:myId", isAuth, getAllmySentFriendRequest)
   .put("/sendFriendOneRequest", isAuth, sendFriendOneRequest)
-  .delete("/deleteOneFriend", isAuth, deleteOneFriend)
+  .delete("/deleteOneFriend/:friendId", isAuth, deleteOneFriend)
   .delete("/deleteAllFriends", isAuth, deleteAllFriends)
   .put("/rejectOneFriendRequest", isAuth, rejectOneFriendRequest)
   .put("/cancelOneSentFriendRequest", isAuth, cancelOneSentFriendRequest)

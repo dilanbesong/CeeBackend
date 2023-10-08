@@ -9,6 +9,11 @@ import { createServer } from "http"
 import Auth  from "./routes/auth.js"
 import { removeStatus } from './Services/status.js'
 import { log } from 'console'
+import bodyParser from "body-parser";
+
+
+const connectedUsers = []
+//const activeFriends = []
 
 const MONGO_URI = "mongodb://localhost:27017/CEEDB" || process.env.MONGO_URI;
 mongoose.connect(MONGO_URI)
@@ -16,7 +21,10 @@ mongoose.connect(MONGO_URI)
 
 const app = express()
 
-app.set("port", process.env.PORT || 5000);
+app.use(bodyParser.json({ limit:'1gb' }))
+app.use(express.json({ limit: "1gb" }))
+
+app.set("port", process.env.PORT || 5000)
 
 const httpServer = createServer(app);
 
@@ -36,11 +44,80 @@ app.use(
 
 app.use(cors());
 app.use(Auth)
-//setInterval(removeStatus, 100)
+setInterval(removeStatus, 100)
 dotenv.config();
 
 app.get('/', (req, res) => {
   return res.send({ msg: 'hello from server ...'})
+})
+
+import { Server } from 'socket.io'
+import { User } from './model/schema.js'
+
+const io = new Server(httpServer, {
+  cors: { origin:'*', methods: ["POST", "GET"] },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+io.on('connection',  (socket) => {
+
+   socket.on("active",  async (data) => {
+    
+    if (getUserSocketId(data.recieverId) == undefined ){ 
+       console.log('connected...');
+       connectedUsers.push({ ...data, socketId: socket.id });
+       const activeIDs = connectedUsers.map((user) => user.userId);
+       const users = await User.find({ _id: { $in: activeIDs } });
+       socket.emit('online', users)
+       socket.emit("status", users);
+       return;
+    }
+      
+   });
+   
+   function getUserSocketId(userId) {
+
+     const user = connectedUsers.find((user) => user.userId == userId)
+     if(user){
+       return user.socketId;
+     }
+     return
+     
+   }
+
+   
+   socket.on("send-message", (data) => {
+
+     if (getUserSocketId(data.recieverId)) {
+       // check if user is online
+       getUserSocketId(data.recieverId);
+       const socketId = getUserSocketId(data.recieverId);
+       socket.broadcast.to(socketId).emit("recieve-message", data);
+       return;
+     }
+     
+   });
+
+   
+
+   socket.on('disconnect', () => {
+      let offlineUser = connectedUsers.find(user => user.socketId == socket.id )
+      let offlineIndex = connectedUsers.indexOf(offlineUser)
+      connectedUsers.splice(offlineIndex, 1)
+      console.log('disconnected...');
+   })
+  
 })
 
 
@@ -49,11 +126,14 @@ httpServer.listen(app.get("port"), function () {
   console.log("Running on port : ", port);
 });
 
-import { hoursAgo} from './Services/HoursAgo.js'
-
-console.log(hoursAgo(new Date("2023-08-04T00:51:05.932+00:00")));
 
 
+ 
+// import { hoursAgo} from './Services/HoursAgo.js'
+
+// console.log(hoursAgo(new Date("2023-08-04T00:51:05.932+00:00")));
+// let x = new Buffer.from([1,2,34,23,4,5,6,7,8,9,0])
+// console.log(x);
 
 
 

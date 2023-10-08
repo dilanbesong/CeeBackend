@@ -1,21 +1,13 @@
 import { Notification, User } from "../model/schema.js";
+import jwt from 'jsonwebtoken'
 const getNotification = async ( req, res) => {
    try {
-          const myId = await jwt.verify(
-            req.session.userToken,
-            process.env.JWT_SECRETE
-          )._id;
-          const { NotificationList } = await User.findById(myId); 
-          const savedNotificationID = await Promise.all( NotificationList.map( async(infoId) => {
-             if( await Notification.findById(infoId) == null){
-                await User.updateOne( {_id:myId}, { $pull:{ NotificationList:infoId } })
-             }
-             return infoId
-          })) 
-          const Notifications = await Notification.find({
-            _id: { $in: savedNotificationID },
-          });
-          return res.send({ Notifications });      
+           const userId = await jwt.verify(
+             req.session.userToken,
+             process.env.JWT_SECRETE
+           ).user._id;
+          const { NotificationList } = await User.findById(userId); 
+          return res.status(200).send({ Notificationlist });      
    } catch (error) {
         return res.send({msg:error.message})          
    }
@@ -23,17 +15,16 @@ const getNotification = async ( req, res) => {
 const deleteOneNotification = async ( req, res) => {
     try {
       const { notificationId } = req.body
-      const myId = await jwt.verify(
-        req.session.userToken,
-        process.env.JWT_SECRETE
-      )._id;
-      const { NotificationList } = await User.findById(myId)
-      await Notification.findByIdAndDelete(notificationId)
-      await User.updateOne(
-        { _id: myId },
-        { $pull: { NotificationList: infoId } }
-      );
-      return res.send({ Notifications:NotificationList})
+       const userId = await jwt.verify(
+         req.session.userToken,
+         process.env.JWT_SECRETE
+       ).user._id;
+      const user = await User.findById(userId)
+      let NotificationList = []
+      NotificationList = user.NotificationList.filter( (notify) => notify._id !== notificationId)
+      user.NotificationList = NotificationList
+      await user.save()
+      return res.status(200).send({ NotificationList:user.NotificationList })
 
     } catch (error) {
       return res.send({ msg: error.message });
@@ -43,11 +34,11 @@ const deleteOneNotification = async ( req, res) => {
 
 const clearAllNotifications = async (req, res) => {
     try {
-      const myId = await jwt.verify(
-        req.session.userToken,
-        process.env.JWT_SECRETE
-      )._id;
-      const user = await User.findById(myId)
+       const userId = await jwt.verify(
+         req.session.userToken,
+         process.env.JWT_SECRETE
+       ).user._id;
+      const user = await User.findById(userId)
       await Notification.deleteMany({_id: { $in:user.NotificationList }})
       user.NotificationList = []
       await user.save()
@@ -57,4 +48,24 @@ const clearAllNotifications = async (req, res) => {
       return res.send({ msg: error.message });
     }
 }
-export { getNotification, deleteOneNotification, clearAllNotifications }
+
+const searchNotifications = async (req, res ) => {
+   try {
+      const { searchInput } = req.params
+       const userId = await jwt.verify(
+         req.session.userToken,
+         process.env.JWT_SECRETE
+       ).user._id;
+      const user = await User.findById(userId)
+     
+     let notificationResults = []
+      notificationResults = user.NotificationList.filter((notify) => {
+        return notify.message.toLowerCase(searchInput.toLowerCase());
+      });
+
+      return res.status(200).send({ notificationResults });
+   } catch (error) {
+      return res.send({ msg: error.message });
+   }
+}
+export { getNotification, deleteOneNotification, clearAllNotifications, searchNotifications }

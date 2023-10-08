@@ -8,12 +8,12 @@ const createPost = async (req, res) => {
       process.env.JWT_SECRETE
     ).user._id;
 
-    const { body, postFiles, poster, category, postStatus } = req.body;
-    
-
+    const { body, fileList, poster, category, postStatus } = req.body;
+  
+    //{ "email":"tekoh@gmail.com", "password":"201A90@30187292" }
     if (poster == "CEE") {
-      //@ reduce files here
-      const newPost = await Post.create(req.body);
+      const newPost =  new Post({...req.body, poster:'CEE'});
+      await newPost.save()
       const users = await User.find();
       const userIds = users.map((user) => user._id);
       await User.updateMany(
@@ -22,9 +22,12 @@ const createPost = async (req, res) => {
       );
       return res.status(200).send({ msg: "Posted by cee !" });
     }
-    if (poster == userId) {
+    if ( poster == 'user' || poster == '') {
+
       const { FriendList, username } = await User.findById(userId);
-      const newPost = await Post.create(req.body);
+      const newPost = new Post({...req.body, poster:userId });
+      await newPost.save()
+      
       const currentFriendListIDs = await Promise.all(
         FriendList.map(async (friendId) => {
           if ((await User.findById(friendId)) == null) {
@@ -41,11 +44,18 @@ const createPost = async (req, res) => {
         { $push: { Posts: newPost._id } }
       );
       await User.updateOne({ _id: userId }, { $push: { Posts: newPost._id } });
-      return res.status(200).send({ msg: `Posted by cee ${username} !` });
+      return res.status(200).send({ msg: `Posted by ${username} !` });
     }
+
     const group = await Group.findById(poster);
     if (group) {
-      const newPost = await Post.create(req.body);
+      const newPost = new Post(req.body);
+      await newPost.save()
+
+      await Group.updateOne(
+        { _id: group._id },
+        { $push: { groupPost:newPost._id } }
+      );
       const { groupMembers } = group;
       const groupMembersIDs = await Promise.all(
         groupMembers.map(async (memberId) => {
@@ -71,24 +81,21 @@ const createPost = async (req, res) => {
 
 const editPost = async (req, res) => {
   try {
-    const { postId, poster, body, category } = req.body;
-
+    const { postId, poster, body, fileList } = req.body;
+     
     const post = await Post.findById(postId)
-
-     async function edit() {
-  
-       const editedPost = await Post.findByIdAndUpdate(postId, {
-         body,
-         category,
-       })
-       return res.status(200).send({ post:editedPost, isEdit: true })
-     }
-    
-       if (post.poster == poster) edit();
+    const { isAdmin } = await User.findById(poster)
+       if (post.poster == poster || isAdmin ){
+          const editedPost = await Post.findByIdAndUpdate(postId, {
+            body,
+            fileList,
+          });
+          return res.status(200).send({ post: editedPost, isEdit: true });
+       }
        return res.send({ msg: "Unauthorize edit to this post !" });
     // { "postId":"64d3dd593a3cd54f0bcf1de5", "poster":"CEE", "body":"Edited by user ","category":"all" }
   } catch (error) {
-    return res.send({ msg: error.message });
+    return res.status(500).send({ msg: error.message });
   }
 };
 
@@ -96,11 +103,13 @@ const editPost = async (req, res) => {
 const deletePost = async (req, res) => {
   try {
 
-    const { postId, poster } = req.body;
+    const { postId, poster } = req.params;
     const post = await Post.findById(postId);
-    
+
     if(post.poster == poster){
+      
       const deletePost = await Post.findByIdAndDelete(postId);
+      console.log();
       return res.status(200).send({ msg: "post deleted", deletePost })
     }
     return res.send({ msg: "Unauthorize delete to this post !" })
@@ -114,18 +123,15 @@ const viewPost = async (req, res) => {
   try {
     const { postId } = req.body;
     const post = await Post.findById(postId);
-    res.status(200).send(post);
+    return res.status(200).send(post);
   } catch (error) {
     return res.send({ msg: error.message });
   }
 };
 
-const getPosts = async (req, res) => {
+const getMyPosts = async (req, res) => {
   try {
-    const userId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    const userId = req.params.userId
     //const { category, fetchCount, poster } = req.body;
     const { Posts } = await User.findById(userId);
 
@@ -150,6 +156,25 @@ const getPosts = async (req, res) => {
   }
 };
 
+const getAllPost = async (req, res) => {
+ try {
+     const posts = await Post.find()
+     return res.status(200).send({ posts })
+ } catch (error) {
+     return res.status(500).send({ err: error.message})
+ }
+}
+
+const sequenciallyFetchPost = async (req, res) => {
+  try {
+     const { skipCount, postLimit } = req.params
+     const posts = await Post.find().skip(parseInt(skipCount)).limit(parseInt(postLimit))
+     return res.status(200).send({ posts });
+  } catch (error) {
+    return res.status(500).send({ err: error.message });
+  }
+}
+
 const getStatusPost = async (req, res) => {
   try {
     const statusPost = await Post.find({ postType: { $eq: "status" } });
@@ -163,44 +188,30 @@ const likePost = async (req, res) => {
   try {
     const { postId, userId } = req.body;
     const { Likes } = await Post.findById(postId);
-    if (Likes.includes(userId))  return res.status(200).send(Likes)
-    
-    await Post.updateOne({ _id: postId }, { $push: { Likes: userId } })
-    return res.status(200).send(Likes);
+    if (Likes.includes(userId)){
+         await Post.updateOne({ _id: postId }, { $pull: { Likes: userId } });
+         return res.status(200).send(Likes);
+    }else {
+        await Post.updateOne({ _id: postId }, { $push: { Likes: userId } });
+        return res.status(200).send(Likes);
+    }
   } catch (error) {
     return res.send({ msg: error.message });
   }
 };
 
-const getLikesFromPost = async (req, res) => {
-  try {
-    const { postId } = req.body;
-    const { Likes } = await Post.findById(postId);
-    const LikesIDs = await Promise.all(
-      Likes.map(async (likeId) => {
-        if ((await User.findById(likeId)) == null) {
-          await Post.updateOne({ _id: postId }, { $pull: { Likes: likeId } });
-        }
-        return likeId;
-      })
-    );
-    const f = new Intl.NumberFormat(undefined,{ notation:"compact"})
-    return res.status(200).send(f.format(LikesIDs.length))
-  } catch (error) {
-    return res.send({ msg: error.message });
-  }
-};
 
 const searchPost = async (req, res) => {
   try {
-    const searchWord = req.query.searchWord.toString().toLowerCase();
+    const {searchWord } = req.params;
     const posts = await Post.find();
-    const suggestedList = posts.filter(({ category, body, createdAt }) => {
+
+    const suggestedList = posts.filter((post) => {
+         if(searchWord === '') return post
       return (
-        body.includes(searchWord) ||
-        body.includes(searchWord) ||
-        body.includes(category) ||
-        createdAt.includes(searchWord)
+        post.body.includes(searchWord.toLowerCase()) ||
+        post.category.includes(searchWord.toLowerCase()) ||
+        new Date(post.createdAt).toLocaleDateString().includes(searchWord.toLowerCase())
       );
     });
     return res.status(200).send(suggestedList);
@@ -211,35 +222,93 @@ const searchPost = async (req, res) => {
 
 const searchGroupsAndFriends = async (req, res) => {
   try {
-    const { searchWord } = req.query;
+    const { searchWord } = req.params;
+    
     const groups = await Group.find();
     const users = await User.find();
-    const groupsAndFriendsData = groups.concat(users);
+    const groupsAndFriendsData = users.concat(groups);
     const suggestions = groupsAndFriendsData.filter((data) => {
+      if(data.groupName) return data
       return (
         data.username.includes(searchWord.toLowerCase()) ||
         data.regNumber.includes(searchWord.toLowerCase()) ||
-        data.email.includes(searchWord.toLowerCase()) ||
-        data.groupName.startsWith(searchWord.toLowerCase())
+        data.email.includes(searchWord.toLowerCase())
       );
     });
+
     return res.status(200).send(suggestions);
   } catch (error) {
     return res.send({ msg: error.message });
   }
 };
 
+const getPoster = async ( req, res) => {
+   try {
+    const posterId = req.params.posterId
+
+    if(posterId == 'CEE'){
+      return res.status(200).send({
+        posterImage:
+          "https://tse2.mm.bing.net/th?id=OIP.Oprpe36XqXLL_HjlF04i2QAAAA&pid=Api&P=0&h=180",
+        posterName: "CEE",
+        postType: "CEE",
+        navigateToProfileUrl:'/home/main'
+      });
+    }
+
+    const user = await User.findById(posterId)
+    const group = await Group.findById(posterId)
+    
+    if(user && group == null){
+       return res.status(200).send({
+         posterImage: user.profileImage,
+         posterId: posterId,
+         posterName: user.username,
+         postType: "user",
+         navigateToProfileUrl:`/home/profile/${posterId} `
+       });
+    }else if(group && user == null){
+    
+      return res.status(200).send({
+        posterImage: group.groupProfile,
+        posterId: posterId,
+        posterName: group.groupName,
+        postType: "group",
+        navigateToProfileUrl:`/home/group/${posterId}`
+      });
+    }
+   
+   } catch (error) {
+     return res.status(500).send({ err: error.message})
+   }
+}
+
+const Postviews = async (req, res) => {
+   try {
+       const { postId } = req.body
+       const post =  await Post.findById(postId)
+       post.views += 1
+       await post.save()
+       return res.status(200).send(post.views)
+   } catch (error) {
+      return res.status(500).send({ err: error.message });
+   }
+}
+
 export {
   createPost,
   editPost,
   viewPost,
   deletePost,
-  getPosts,
+  getMyPosts,
+  getAllPost,
   searchPost,
   getStatusPost,
   searchGroupsAndFriends,
+  getPoster,
   likePost,
-  getLikesFromPost,
+  Postviews,
+  sequenciallyFetchPost,
 };
 
 

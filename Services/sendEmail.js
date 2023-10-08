@@ -5,7 +5,7 @@ dotenv.config();
 const sendEmail = async (email, message) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
-    host: "smpt.gmail.com",
+   // host: "smpt.gmail.com",
 
     secure: false, 
     auth: {
@@ -18,10 +18,9 @@ const sendEmail = async (email, message) => {
     from: '"Dilan Besong 👻" <dylanbesong001@gmail.com>', 
     to: email, 
     subject: "Get code ✔", 
-    text: `Welcome ${email}:`,
-    html: message, 
+    text: `Welcome ${email} your reset code is ${message}`,
   });
-  console.log("Message sent: %s", info.messageId);
+    console.log(info.messageId);
 };
 
 export default sendEmail
