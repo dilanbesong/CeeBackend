@@ -56,15 +56,22 @@ const makePayment = async (req, res ) => {
 const searchPayments = async(req, res) => {
    try {
       const { refNumber } = req.params
+      console.log(refNumber);
       const payments = await Payment.find()
       let searchPaymentResults = []
+      console.log(payments);
       searchPaymentResults = payments.filter( payment => {
-        return payment.refNumber.includes(refNumber)
+        return payment.refNumber.reference.includes(refNumber)
       })
-      const payList = searchPaymentResults.map(student => {
-         return student.regNumber
-      })
-      const payers = await User.find({ regNumber:{ $inc: payList } })
+      const payList = await Promise.all(
+        searchPaymentResults.map(async (student) => {
+          const { _id } = await User.findOne({ regNumber: student.regNumber });
+          return _id;
+        })
+      );
+  
+      const payers = await User.find({ _id:{ $in: payList } })
+      console.log(payers);
       return res.status(200).send(payers)
    } catch (error) {
        return res.send({ msg: error.message }); 

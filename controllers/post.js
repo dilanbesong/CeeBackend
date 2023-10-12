@@ -20,7 +20,7 @@ const createPost = async (req, res) => {
         { _id: { $in: userIds } },
         { $push: { Posts: newPost._id } }
       );
-      return res.status(200).send({ msg: "Posted by cee !" });
+      return res.status(200).send(newPost);
     }
     if ( poster == 'user' || poster == '') {
 
@@ -44,7 +44,7 @@ const createPost = async (req, res) => {
         { $push: { Posts: newPost._id } }
       );
       await User.updateOne({ _id: userId }, { $push: { Posts: newPost._id } });
-      return res.status(200).send({ msg: `Posted by ${username} !` });
+      return res.status(200).send(newPost);
     }
 
     const group = await Group.findById(poster);
@@ -72,7 +72,7 @@ const createPost = async (req, res) => {
         { _id: { $in: groupMembersIDs } },
         { $push: { Posts: newPost._id } }
       );
-      return res.status(200).send({ msg: `Posted by ${group.groupName} !` });
+      return res.status(200).send(newPost);
     }
   } catch (error) {
     return res.send({ msg: error.message });

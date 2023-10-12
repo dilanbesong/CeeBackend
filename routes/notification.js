@@ -5,16 +5,18 @@ import {
   deleteOneNotification,
   clearAllNotifications,
   searchNotifications,
+  createNotification,
 } from "../controllers/notification.js";
 const router = express.Router()
 
 router
-  .get("/getNotification", isAuth, getNotification)
+  .post("/createNotification", isAuth, createNotification)
+  .get("/getNotification/:userId", isAuth, getNotification)
   .get("/searchNotifications/:searchInput", isAuth, searchNotifications)
-  .delete(
-    "/deleteOneNotification/:notificationId",
+  .put(
+    "/deleteOneNotification",
     isAuth,
     deleteOneNotification
   )
-  .delete("/clearAllNotifications", isAuth, clearAllNotifications);
+  .delete("/clearAllNotifications/:userId", isAuth, clearAllNotifications);
 export default router

@@ -133,8 +133,10 @@ const notificationSchema = new Schema(
   {
     message: String,
     notificatorId: String,
+    redirectUrl:String,
+    isView:{ type:Boolean, default:false },
+    createdAt: { type: Date, default: new Date() }
   },
-  { timestamps: {} }
 );
 const messageSchema = new Schema(
   {

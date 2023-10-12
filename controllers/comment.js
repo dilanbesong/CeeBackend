@@ -22,17 +22,17 @@ const editComment = async(req, res) => {
         ).user._id;
         const { postId, commentorId, commentsArr } = req.body;
 
-        if (commentorId == myId) {
+       // if (commentorId == myId) {
           const post = await Post.findById(postId)  
             await Post.findOneAndUpdate(
               { _id: postId },
               { Comments: commentsArr }
             );
           return res.status(200).send(post.Comments)
-        }
-        return res
-          .status(404)
-          .send({ msg: " You cannot edit this comments " });
+       // }
+        // return res
+        //   .status(404)
+        //   .send({ msg: " You cannot edit this comments " });
 
     } catch (error) {
       return res.sendStatus(200).send({ msg: error.message })
@@ -59,12 +59,12 @@ const deleteComment = async (req, res) => {
 
     const { postId, commentorId, commentsArr } = req.body;
 
-    if (commentorId == myId) {
+   // if (commentorId == myId) {
        const post = await Post.findById(postId);
        await Post.findOneAndUpdate({ _id: postId }, { Comments: commentsArr });
        return res.status(200).send(post.Comments);
-    }
-    return res.send(404).send({ msg: "You cannot delete this comment" });
+    //}
+   // return res.send(404).send({ msg: "You cannot delete this comment" });
   } catch (error) {
     return res.send(500).send({ msg: error.message });
   }

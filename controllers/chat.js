@@ -1,4 +1,5 @@
 import { User, Chat, Message } from "../model/schema.js"
+import axios from 'axios'
 
 const displayChatList = async (req, res) =>{
       try {
@@ -14,6 +15,8 @@ const displayChatList = async (req, res) =>{
           return res.status(500).send( { err: error.message } )        
       }            
 }
+
+
 const getChats = async (req, res) => {
        try {
           const { friendId, myId } = req.params;  
@@ -32,6 +35,21 @@ const getChats = async (req, res) => {
           return res.status(500).send({ err: error.message });       
        }           
 }
+
+const getLastChat = async (req, res) => {
+  try {
+    const { friendId, myId } = req.params;
+
+    const lastChat = await axios.get(`/chat/getChats/${friendId}/${myId}`);
+    return res
+      .status(200)
+      .send({
+        lastChat: lastChat.Conversions[lastChat.Conversions.length - 1],
+      });
+  } catch (error) {
+    return res.status(500).send({ err: error.message });
+  }
+};
 
 const saveChat = async (req, res) => {
      try { 
@@ -124,4 +142,4 @@ const clearChats = async (req, res) => {
     }              
 }
 
-export { displayChatList, saveChat, getChats, deleteOneChat, pullFriendFromChatlist, clearChats }
+export { displayChatList, saveChat, getChats, deleteOneChat, pullFriendFromChatlist, clearChats, getLastChat }
