@@ -50,7 +50,7 @@ dotenv.config();
 app.get('/', (req, res) => {
   return res.send({ msg: 'hello from server ...'})
 })
-
+ 
 import { Server } from 'socket.io'
 import { User } from './model/schema.js'
 
