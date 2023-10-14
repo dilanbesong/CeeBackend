@@ -47,7 +47,7 @@ const login = async (req, res) => {
         expiresIn: "24h",
       });
       SaveToCookie(req, userToken);
-      Active(httpServer, user._id);
+     // Active(httpServer, user._id);
       return res.send({ msg: "User successfully loggedIn", user });
     }
   } catch (error) {
