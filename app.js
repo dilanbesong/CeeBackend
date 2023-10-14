@@ -19,7 +19,7 @@ const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB"; ;
 mongoose.connect(MONGO_URI)
 
 
-const app = express()
+const app = express() 
 
 app.use(bodyParser.json({ limit:'1gb' }))
 app.use(express.json({ limit: "1gb" }))
