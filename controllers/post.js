@@ -9,11 +9,13 @@ const createPost = async (req, res) => {
     ).user._id;
 
     const { body, fileList, poster, category, postStatus } = req.body;
-  
+   
     //{ "email":"tekoh@gmail.com", "password":"201A90@30187292" }
     if (poster == "CEE") {
+      console.log(req.body);
       const newPost =  new Post({...req.body, poster:'CEE'});
       await newPost.save()
+      console.log(newPost);
       const users = await User.find();
       const userIds = users.map((user) => user._id);
       await User.updateMany(

@@ -8,14 +8,13 @@ import MongoDBStore from 'connect-mongodb-session'
 import { createServer } from "http"
 import Auth  from "./routes/auth.js"
 import { removeStatus } from './Services/status.js'
-import { log } from 'console'
 import bodyParser from "body-parser";
 
 
 const connectedUsers = []
 //const activeFriends = []
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB"; ;
+const MONGO_URI =  "mongodb://localhost:27017/CEEDB" || process.env.MONGO_URI ;
 mongoose.connect(MONGO_URI)
 
 
@@ -23,10 +22,13 @@ const app = express()
 
 app.use(bodyParser.json({ limit:'1gb' }))
 app.use(express.json({ limit: "1gb" }))
+app.use(bodyParser.urlencoded({ extended:true }))
 
-app.set("port", process.env.PORT || 5000)
+app.set("port", process.env.PORT)
 
 const httpServer = createServer(app);
+
+
 
 const store = new MongoDBStore(session)({
   uri: MONGO_URI,
@@ -79,7 +81,7 @@ io.on('connection',  (socket) => {
        connectedUsers.push({ ...data, socketId: socket.id });
        const activeIDs = connectedUsers.map((user) => user.userId);
        const users = await User.find({ _id: { $in: activeIDs } });
-       socket.emit('online', users)
+      // socket.emit('online', users)
        socket.emit("status", users);
        return;
     }
