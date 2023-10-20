@@ -14,7 +14,7 @@ import bodyParser from "body-parser";
 const connectedUsers = []
 //const activeFriends = []
 
-const MONGO_URI =  "mongodb://localhost:27017/CEEDB" || process.env.MONGO_URI ;
+const MONGO_URI =  "mongodb://localhost:27017/CEEDB" ||   process.env.MONGO_URI;
 mongoose.connect(MONGO_URI)
 
 
@@ -24,7 +24,7 @@ app.use(bodyParser.json({ limit:'1gb' }))
 app.use(express.json({ limit: "1gb" }))
 app.use(bodyParser.urlencoded({ extended:true }))
 
-app.set("port", process.env.PORT)
+app.set("port", process.env.PORT || 5000)
 
 const httpServer = createServer(app);
 
