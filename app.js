@@ -13,7 +13,7 @@ import bodyParser from "body-parser";
 
 const connectedUsers = []
 //const activeFriends = []
-
+ 
 const MONGO_URI =  process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
 console.log(MONGO_URI);
 mongoose.connect(MONGO_URI)
