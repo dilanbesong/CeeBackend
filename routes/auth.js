@@ -40,7 +40,7 @@ router
   .put('/editProfile',  editProfile )
   .put("/resetPassword", hasCode, resetPassword)
   .get("/user", getUser)
-  .get('/user/:userId', isAuth, getUserById)
+  .get('/user/:userId',  getUserById)
 
 
 export default router;
