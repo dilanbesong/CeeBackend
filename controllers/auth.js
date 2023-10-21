@@ -46,7 +46,13 @@ const login = async (req, res) => {
       const userToken = jwt.sign({ user }, process.env.JWT_SECRETE, {
         expiresIn: "24h",
       });
-      SaveToCookie(req, userToken);
+      // req.session.isloggedIn = true
+      const numberOfdays = 1;
+      req.session.cookie.maxAge = numberOfdays * 24 * 60 * 60 * 1000;
+      req.session.userToken = userToken;
+      req.session.isloggedIn = true;
+      req.session.cookie.expires = false;
+      //SaveToCookie(req, userToken);
      // Active(httpServer, user._id);
       return res.send({ msg: "User successfully loggedIn", user });
     }
