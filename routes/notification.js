@@ -10,13 +10,12 @@ import {
 const router = express.Router()
 
 router
-  .post("/createNotification", isAuth, createNotification)
-  .get("/getNotification/:userId", isAuth, getNotification)
-  .get("/searchNotifications/:searchInput", isAuth, searchNotifications)
+  .post("/createNotification", createNotification)
+  .get("/getNotification/:userId", getNotification)
+  .get("/searchNotifications/:searchInput", searchNotifications)
   .put(
     "/deleteOneNotification",
-    isAuth,
     deleteOneNotification
   )
-  .delete("/clearAllNotifications/:userId", isAuth, clearAllNotifications);
+  .delete("/clearAllNotifications/:userId",  clearAllNotifications);
 export default router

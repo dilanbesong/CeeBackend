@@ -11,10 +11,10 @@ import { isAuth } from '../middlewears/isAuth.js';
 const router = express.Router()
 
 router
-  .get("/getAllAdmins", isAuth, isCEEAdmin, getAllAdmins)
-  .get("/getStudents/:YearOfEntry", isAuth, getStudents)
-  .get("/getYearOptions", isAuth, isCEEAdmin, getYearOptions)
-  .put("/blockAccount", isAuth,  blockAccount)
-  .delete("/deleteOneUser/:userId", isAuth, isCEEAdmin, deleteOneUser);
+  .get("/getAllAdmins", isCEEAdmin, getAllAdmins)
+  .get("/getStudents/:YearOfEntry", getStudents)
+  .get("/getYearOptions", isCEEAdmin, getYearOptions)
+  .put("/blockAccount",  blockAccount)
+  .delete("/deleteOneUser/:userId", isCEEAdmin, deleteOneUser);
 
 export default router

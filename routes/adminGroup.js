@@ -14,12 +14,12 @@ const router = express.Router()
 
 router
   
-  .get("/getALLGroupMembers/:groupId", isAuth,  getAllGroupMembers)
-  .put("/editGroup", isAuth, isGroupAdmin, editGroup)
-  .delete("deleteGroup", isAuth, isGroupAdmin, deleteGroup)
-  .delete("/deleteOneMember/:memberId", isAuth, isGroupAdmin, deleteOneMember)
-  .delete("/deleteALLMembers", isAuth, isGroupAdmin, deleteAllMembers)
-  .delete("/deleteOneGroupRequest", isAuth, isGroupAdmin, deleteOneGroupRequest)
+  .get("/getALLGroupMembers/:groupId",  getAllGroupMembers)
+  .put("/editGroup", isGroupAdmin, editGroup)
+  .delete("deleteGroup", isGroupAdmin, deleteGroup)
+  .delete("/deleteOneMember/:memberId", isGroupAdmin, deleteOneMember)
+  .delete("/deleteALLMembers", isGroupAdmin, deleteAllMembers)
+  .delete("/deleteOneGroupRequest", isGroupAdmin, deleteOneGroupRequest)
   
 
 

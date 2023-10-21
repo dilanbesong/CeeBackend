@@ -9,9 +9,9 @@ import { isAuth } from '../middlewears/isAuth.js';
 const router = express.Router();
 
 router
-  .post("/createComment", isAuth, createComment)
-  .get('/getComments',isAuth, getComments)
-  .put('/editComment', isAuth, editComment)
-  .put('/deleteComment',isAuth, deleteComment);
+  .post("/createComment", createComment)
+  .get('/getComments', getComments)
+  .put('/editComment', editComment)
+  .put('/deleteComment', deleteComment);
 
 export default router;

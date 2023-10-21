@@ -16,16 +16,16 @@ import {
 const router = express.Router()
 
 router
-  .get("/friends/:userId", isAuth, getMyFriendList)
-  .get("/myFriendRequest/:myId", isAuth, getMyFriendRequestList)
-  .get("/getAllmySentFriendRequest/:myId", isAuth, getAllmySentFriendRequest)
-  .put("/sendFriendOneRequest", isAuth, sendFriendOneRequest)
-  .delete("/deleteOneFriend/:friendId", isAuth, deleteOneFriend)
-  .delete("/deleteAllFriends", isAuth, deleteAllFriends)
-  .put("/rejectOneFriendRequest", isAuth, rejectOneFriendRequest)
-  .put("/cancelOneSentFriendRequest", isAuth, cancelOneSentFriendRequest)
-  .put("/cancelAllSentFriendRequest", isAuth, cancelAllSentFriendRequest)
-  .put("/acceptOneFriendRequest", isAuth, acceptOneFriendRequest)
+  .get("/friends/:userId", getMyFriendList)
+  .get("/myFriendRequest/:myId", getMyFriendRequestList)
+  .get("/getAllmySentFriendRequest/:myId", getAllmySentFriendRequest)
+  .put("/sendFriendOneRequest", sendFriendOneRequest)
+  .delete("/deleteOneFriend/:friendId", deleteOneFriend)
+  .delete("/deleteAllFriends", deleteAllFriends)
+  .put("/rejectOneFriendRequest", rejectOneFriendRequest)
+  .put("/cancelOneSentFriendRequest", cancelOneSentFriendRequest)
+  .put("/cancelAllSentFriendRequest", cancelAllSentFriendRequest)
+  .put("/acceptOneFriendRequest",  acceptOneFriendRequest)
 
 
 export default router

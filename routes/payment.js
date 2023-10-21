@@ -6,8 +6,8 @@ import { isAuth } from "../middlewears/isAuth.js"
 const router = express.Router()
 
 router
-.get("/getReciepts", isAuth, getReciepts)
-.get('/searchPayments/:refNumber', isAuth, searchPayments)
-.post("/makePayment", isAuth, makePayment)
+.get("/getReciepts", getReciepts)
+.get('/searchPayments/:refNumber', searchPayments)
+.post("/makePayment", makePayment)
 
 export default router

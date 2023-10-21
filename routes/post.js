@@ -29,17 +29,17 @@ router
     isAuth,
     sequenciallyFetchPost
   )
-  .post("/viewPost", isAuth, viewPost)
-  .post("/likePost", isAuth, likePost)
-  .post("/numberOFviews", isAuth, Postviews)
+  .post("/viewPost",  viewPost)
+  .post("/likePost",  likePost)
+  .post("/numberOFviews",  Postviews)
   .get("/getStatusPost", isAuth, getStatusPost)
-  .get("/getPoster/:posterId", isAuth, getPoster)
-  .get("/searchGroupsAndFriends/:searchWord", isAuth, searchGroupsAndFriends)
-  .get("/searchPost/:searchWord", isAuth, searchPost)
-  .get("/friendSuggestions", isAuth, friendsSuggestions)
-  .get("/groupSuggestions", isAuth, groupSuggestions)
-  .post("/createPost", isAuth, createPost)
-  .put("/editPost", isAuth, editPost)
-  .delete("/deletePost/:postId/:poster", isAuth, deletePost);
+  .get("/getPoster/:posterId",  getPoster)
+  .get("/searchGroupsAndFriends/:searchWord",  searchGroupsAndFriends)
+  .get("/searchPost/:searchWord",  searchPost)
+  .get("/friendSuggestions",  friendsSuggestions)
+  .get("/groupSuggestions",  groupSuggestions)
+  .post("/createPost",  createPost)
+  .put("/editPost",  editPost)
+  .delete("/deletePost/:postId/:poster",  deletePost);
 
 export default router

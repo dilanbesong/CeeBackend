@@ -10,10 +10,10 @@ import {
 } from "../controllers/group.js";
 const router = express.Router()
  router
-   .get("/getGroupPost/:groupId", isAuth, getGroupPost)
-   .get("/getMyGroups", isAuth, getMyGroups)
-   .get("/getGroup/:groupId", isAuth, getGroup)
-   .post("/createGroup", isAuth, isGroupAdmin, createGroup)
-   .put("/joinGroup", isAuth, joinGroup);
+   .get("/getGroupPost/:groupId", getGroupPost)
+   .get("/getMyGroups", getMyGroups)
+   .get("/getGroup/:groupId", getGroup)
+   .post("/createGroup", isGroupAdmin, createGroup)
+   .put("/joinGroup", joinGroup);
 
 export default router
