@@ -23,7 +23,7 @@ const router = express.Router()
 
 router
   .get("/getMyPosts/:userId", isAuth, getMyPosts) // getting my own posts
-  .get("/getAllPost", isAuth, getAllPost) // all/general post
+  .get("/getAllPost",  getAllPost) // all/general post
   .get(
     "/sequenciallyFetchPost/:skipCount/:postLimit",
     isAuth,
