@@ -44,16 +44,17 @@ app.use(
     store,
   })
 );
-const corsOptions = {
-  origin: process.env.ORIGIN || "http://127.0.0.1:5173",
-  optionsSuccessStatus: 200, // For legacy browser support
-  methods: "GET, PUT, POST, DELETE",
-};
 
-app.use(cors(corsOptions));
 app.use(Auth)
 setInterval(removeStatus, 100)
 dotenv.config();
+
+const corsOptions = {
+  origin: process.env.ORIGIN || "http://127.0.0.1:5173",
+  optionsSuccessStatus: 200, // For legacy browser support
+};
+
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
   return res.send({ msg: 'hello from server ...'})
