@@ -6,13 +6,13 @@ const createPost = async (req, res) => {
     const { body, fileList, poster, userId, category, postStatus } = req.body;
     const objectWithoutUserID = (object, key) => {
       const {[key]:deletedKey,...otherKeys} = object
-      
+
       return otherKeys
     }
 
     //{ "email":"tekoh@gmail.com", "password":"201A90@30187292" }
     if (poster == "CEE") {
-      console.log(req.body);
+    
       const newPost = new Post({ ...objectWithoutUserID(req.body, 'userId'), poster: "CEE" });
       await newPost.save();
       console.log(newPost);
