@@ -22,7 +22,7 @@ import { groupSuggestions } from '../suggestions/groupSuggestions.js';
 const router = express.Router()
 
 router
-  .get("/getMyPosts/:userId", isAuth, getMyPosts) // getting my own posts
+  .get("/getMyPosts/:userId",  getMyPosts) // getting my own posts
   .get("/getAllPost",  getAllPost) // all/general post
   .get(
     "/sequenciallyFetchPost/:skipCount/:postLimit",

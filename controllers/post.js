@@ -3,18 +3,17 @@ import { Group, Post, User } from "../model/schema.js"
 
 const createPost = async (req, res) => {
   try {
-    const userId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    const { body, fileList, poster, userId, category, postStatus } = req.body;
+    const objectWithoutUserID = (object, key) => {
+      const {[key]:deletedKey,...otherKeys} = object
+      return otherKeys
+    }
 
-    const { body, fileList, poster, category, postStatus } = req.body;
-   
     //{ "email":"tekoh@gmail.com", "password":"201A90@30187292" }
     if (poster == "CEE") {
       console.log(req.body);
-      const newPost =  new Post({...req.body, poster:'CEE'});
-      await newPost.save()
+      const newPost = new Post({ ...objectWithoutUserID(req.body, 'userId'), poster: "CEE" });
+      await newPost.save();
       console.log(newPost);
       const users = await User.find();
       const userIds = users.map((user) => user._id);
@@ -24,12 +23,16 @@ const createPost = async (req, res) => {
       );
       return res.status(200).send(newPost);
     }
-    if ( poster == 'user' || poster == '') {
-
+    if (poster == "user" || poster == "") {
+      // const userId = await jwt.verify(
+      //   req.session.userToken,
+      //   process.env.JWT_SECRETE
+      // ).user._id;
+      console.log(userId);
       const { FriendList, username } = await User.findById(userId);
-      const newPost = new Post({...req.body, poster:userId });
-      await newPost.save()
-      
+      const newPost = new Post({ ...objectWithoutUserID(req.body, 'userId'), poster: userId });
+      await newPost.save();
+
       const currentFriendListIDs = await Promise.all(
         FriendList.map(async (friendId) => {
           if ((await User.findById(friendId)) == null) {
@@ -51,12 +54,12 @@ const createPost = async (req, res) => {
 
     const group = await Group.findById(poster);
     if (group) {
-      const newPost = new Post(req.body);
-      await newPost.save()
+      const newPost = new Post(objectWithoutUserID(req.body, "userId"));
+      await newPost.save();
 
       await Group.updateOne(
         { _id: group._id },
-        { $push: { groupPost:newPost._id } }
+        { $push: { groupPost: newPost._id } }
       );
       const { groupMembers } = group;
       const groupMembersIDs = await Promise.all(

@@ -141,8 +141,12 @@ httpServer.listen(app.get("port"), function () {
 
 
 
-
-
+// let obj = {a:1,b:2, c:3, d:4, e:5}
+// const objectWithoutUserID = (object, key) => {
+//   const {[key]:deletedKey,...otherKeys} = object
+//   return otherKeys
+// }
+// console.log(objectWithoutUserID(obj, 'b'));
 
 
 
