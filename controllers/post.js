@@ -6,6 +6,7 @@ const createPost = async (req, res) => {
     const { body, fileList, poster, userId, category, postStatus } = req.body;
     const objectWithoutUserID = (object, key) => {
       const {[key]:deletedKey,...otherKeys} = object
+      
       return otherKeys
     }
 
