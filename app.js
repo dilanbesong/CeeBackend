@@ -59,7 +59,7 @@ import { Server } from 'socket.io'
 import { User } from './model/schema.js'
 
 const io = new Server(httpServer, {
-  cors: { origin:'*', methods: ["POST", "GET"] },
+  cors: { origin: process.env.ORIGIN || '*', methods: ["POST", "GET"] },
 });
 
 
