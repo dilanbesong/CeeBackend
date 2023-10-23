@@ -21,6 +21,7 @@ mongoose.connect(MONGO_URI)
 
 const app = express() 
 
+app.use(cors())
 app.use(bodyParser.json({ limit:'1gb' }))
 app.use(express.json({ limit: "1gb" }))
 app.use(bodyParser.urlencoded({ extended:true }))
@@ -46,7 +47,7 @@ app.use(
 );
 
 
-app.use(cors());
+
 app.use(Auth)
 setInterval(removeStatus, 100)
 

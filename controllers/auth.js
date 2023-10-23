@@ -35,6 +35,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(req.body);
     const user = await User.findOne({ email });
     if (user == null)
       return res.send({
@@ -46,13 +47,8 @@ const login = async (req, res) => {
       const userToken = jwt.sign({ user }, process.env.JWT_SECRETE, {
         expiresIn: "24h",
       });
-      // req.session.isloggedIn = true
-      const numberOfdays = 1;
-      req.session.cookie.maxAge = numberOfdays * 24 * 60 * 60 * 1000;
-      req.session.userToken = userToken;
-      req.session.isloggedIn = true;
-      req.session.cookie.expires = false;
-      //SaveToCookie(req, userToken);
+       req.session.isloggedIn = true
+      SaveToCookie(req, userToken);
      // Active(httpServer, user._id);
       return res.send({ msg: "User successfully loggedIn", user });
     }
