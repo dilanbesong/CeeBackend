@@ -10,11 +10,11 @@ import Auth  from "./routes/auth.js"
 import { removeStatus } from './Services/status.js'
 import bodyParser from "body-parser";
 
-dotenv.config();
+
 const connectedUsers = []
 //const activeFriends = []
- // 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
+
+const MONGO_URI =  process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
 console.log(MONGO_URI);
 mongoose.connect(MONGO_URI)
 
@@ -45,13 +45,8 @@ app.use(
   })
 );
 
-//
-const corsOptions = {
-  origin: process.env.ORIGIN || "http://127.0.0.1:5173",
-  optionsSuccessStatus: 200, // For legacy browser support
-};
-
-app.use(cors(corsOptions))
+dotenv.config();
+app.use(cors());
 app.use(Auth)
 setInterval(removeStatus, 100)
 
@@ -147,12 +142,8 @@ httpServer.listen(app.get("port"), function () {
 
 
 
-// let obj = {a:1,b:2, c:3, d:4, e:5}
-// const objectWithoutUserID = (object, key) => {
-//   const {[key]:deletedKey,...otherKeys} = object
-//   return otherKeys
-// }
-// console.log(objectWithoutUserID(obj, 'b'));
+
+
 
 
 
