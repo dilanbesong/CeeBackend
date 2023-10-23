@@ -25,8 +25,7 @@ const connectedUsers = []
 //const activeFriends = []
 
 const MONGO_URI =  process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
-console.log(MONGO_URI);
-mongoose.connect(MONGO_URI).then( data => console.log('connected')).catch(err => console.log(err.message))
+mongoose.connect(MONGO_URI)
 
 
 
