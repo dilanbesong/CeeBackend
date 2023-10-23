@@ -50,6 +50,7 @@ const login = async (req, res) => {
        req.session.isloggedIn = true
       SaveToCookie(req, userToken);
      // Active(httpServer, user._id);
+     console.log({ msg: "User successfully loggedIn", user });
       return res.send({ msg: "User successfully loggedIn", user });
     }
   } catch (error) {
