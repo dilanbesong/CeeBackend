@@ -9,17 +9,24 @@ import { createServer } from "http"
 import Auth  from "./routes/auth.js"
 import { removeStatus } from './Services/status.js'
 import bodyParser from "body-parser";
-
+//mongodb+srv://Dilan:99186820DI@cluster0.gu5zu9x.mongodb.net/CEEDB
+//mongodb+srv://joshuang:chiLOT%40123@cluster0.4438nxg.mongodb.net/social?retryWrites=true&w=majority
 dotenv.config();
 const app = express();
-app.use(cors());
+
+const corsOptions = {
+  origin: process.env.ORIGIN,
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
 
 const connectedUsers = []
 //const activeFriends = []
 
 const MONGO_URI =  process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
-
-mongoose.connect(MONGO_URI)
+console.log(MONGO_URI);
+mongoose.connect(MONGO_URI).then( data => console.log('connected')).catch(err => console.log(err.message))
 
 
 
