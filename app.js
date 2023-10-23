@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  origin: process.env.ORIGIN,
+  origin:'*',
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
@@ -23,8 +23,8 @@ app.use(cors(corsOptions));
 
 const connectedUsers = []
 //const activeFriends = []
-
-const MONGO_URI =  process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
+//  process.env.MONGO_URI ||
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
 mongoose.connect(MONGO_URI)
 
 
@@ -68,7 +68,7 @@ import { Server } from 'socket.io'
 import { User } from './model/schema.js'
 
 const io = new Server(httpServer, {
-  cors: { origin: process.env.ORIGIN || '*', methods: ["POST", "GET"] },
+  cors: { origin:'*', methods: ["POST", "GET"] },
 });
 
 
