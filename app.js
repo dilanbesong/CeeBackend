@@ -10,11 +10,11 @@ import Auth  from "./routes/auth.js"
 import { removeStatus } from './Services/status.js'
 import bodyParser from "body-parser";
 
-
+dotenv.config();
 const connectedUsers = []
 //const activeFriends = []
- 
-const MONGO_URI =  process.env.MONGO_URI;
+ // 
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
 console.log(MONGO_URI);
 mongoose.connect(MONGO_URI)
 
@@ -45,16 +45,16 @@ app.use(
   })
 );
 
-app.use(Auth)
-setInterval(removeStatus, 100)
-dotenv.config();
-
+//
 const corsOptions = {
   origin: process.env.ORIGIN || "http://127.0.0.1:5173",
   optionsSuccessStatus: 200, // For legacy browser support
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions))
+app.use(Auth)
+setInterval(removeStatus, 100)
+
 
 app.get('/', (req, res) => {
   return res.send({ msg: 'hello from server ...'})
