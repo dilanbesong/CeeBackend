@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken"
+
 import { Group, Post, User } from "../model/schema.js"
 
 const createPost = async (req, res) => {
@@ -25,10 +25,7 @@ const createPost = async (req, res) => {
       return res.status(200).send(newPost);
     }
     if (poster == "user" || poster == "") {
-      // const userId = await jwt.verify(
-      //   req.session.userToken,
-      //   process.env.JWT_SECRETE
-      // ).user._id;
+      
       console.log(userId);
       const { FriendList, username } = await User.findById(userId);
       const newPost = new Post({ ...objectWithoutUserID(req.body, 'userId'), poster: userId });

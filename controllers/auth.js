@@ -35,8 +35,9 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
+    
     const user = await User.findOne({ email });
+    
     if (user == null)
       return res.send({
         msg: "Please visit the cee department to get a free account",
@@ -44,9 +45,11 @@ const login = async (req, res) => {
     if (user.isBlocked)
       return res.send({ msg: "Please visit the school admin " });
     if (await bcrypt.compare(password, user.password)) {
+      console.log(user);
       const userToken = jwt.sign({ user }, process.env.JWT_SECRETE, {
         expiresIn: "24h",
       });
+      console.log(userToken);
        req.session.isloggedIn = true
       SaveToCookie(req, userToken);
      // Active(httpServer, user._id);
