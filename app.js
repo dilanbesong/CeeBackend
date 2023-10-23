@@ -10,7 +10,7 @@ import Auth  from "./routes/auth.js"
 import { removeStatus } from './Services/status.js'
 import bodyParser from "body-parser";
 
-
+dotenv.config();
 const connectedUsers = []
 //const activeFriends = []
 
@@ -45,7 +45,7 @@ app.use(
   })
 );
 
-dotenv.config();
+
 app.use(cors());
 app.use(Auth)
 setInterval(removeStatus, 100)
