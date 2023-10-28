@@ -10,11 +10,11 @@ import Auth  from "./routes/auth.js"
 import { removeStatus } from './Services/status.js'
 import bodyParser from "body-parser"
 import { corsOptions } from "./configue/corsOption.js";
-//mongodb+srv://Dilan:99186820DI@cluster0.gu5zu9x.mongodb.net/CEEDB
+import { allowedOrigins } from './configue/allowedOrigins.js'
 //mongodb+srv://joshuang:chiLOT%40123@cluster0.4438nxg.mongodb.net/social?retryWrites=true&w=majority
 dotenv.config();
-
-const MONGO_URI = process.env.MONGO_URI ||  "mongodb://localhost:27017/CEEDB";
+// process.env.MONGO_URI ||  
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
 mongoose.connect(MONGO_URI)
 
 const app = express();
@@ -67,7 +67,7 @@ import { Server } from 'socket.io'
 import { User } from './model/schema.js'
 
 const io = new Server(httpServer, {
-  cors: { origin:'*', methods: ["POST", "GET"] },
+  cors: { origin:allowedOrigins, methods: ["POST", "GET"] },
 });
 
 
