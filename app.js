@@ -22,11 +22,6 @@ const app = express();
 app.use(cors(corsOptions));
 
 const connectedUsers = []
-//const activeFriends = []
-//  process.env.MONGO_URI ||
-
-
-
 
 
 app.use(bodyParser.json({ limit:'1gb' }))

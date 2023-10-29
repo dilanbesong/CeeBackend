@@ -4,15 +4,12 @@ import jwt from "jsonwebtoken";
 
 const getReciepts = async (req, res) => {
       try {
-            const myId = await jwt.verify(
-              req.session.userToken,
-              process.env.JWT_SECRETE
-            ).user._id; 
-            const {  DepartmentalFees } = await User.findById(myId)
+           const { userId }  = req.params
+            const {  DepartmentalFees } = await User.findById(userId)
             const FeeIDs = await Promise.all( DepartmentalFees.map( async (paymentId) => {
                   if( await Payment.find(paymentId) == null){
                      await User.updateOne(
-                       { _id:myId },
+                       { _id:userId },
                        { $pull: { DepartmentalFees: paymentId} }
                      );               
                   }
@@ -26,12 +23,12 @@ const getReciepts = async (req, res) => {
 }
 const makePayment = async (req, res ) => {
      try {
-         const myId = await jwt.verify(
-           req.session.userToken,
-           process.env.JWT_SECRETE
-         ).user._id;
+        //  const myId = await jwt.verify(
+        //    req.session.userToken,
+        //    process.env.JWT_SECRETE
+        //  ).user._id;
          const { regNumber, refNumber, amount, level } = req.body
-         const user = await User.findById(myId)
+         const user = await User.findOne({ regNumber })
 
          const departMentalFee = 5700 
          if( parseFloat(amount) !== departMentalFee ) {
@@ -40,7 +37,7 @@ const makePayment = async (req, res ) => {
          const newReceipt = new Payment(req.body)
          await newReceipt.save()
          await User.updateOne(
-           { _id: myId },
+           { regNumber: user.regNumber },
            { $push: { DepartmentalFees: newReceipt._id } }
          ); 
         if( user.level == 500) return res.status(200).send({ msg: "Payment Successfull !" }); 
