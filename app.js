@@ -11,11 +11,13 @@ import { removeStatus } from './Services/status.js'
 import bodyParser from "body-parser"
 import { corsOptions } from "./configue/corsOption.js";
 import { allowedOrigins } from './configue/allowedOrigins.js'
-//mongodb+srv://joshuang:chiLOT%40123@cluster0.4438nxg.mongodb.net/social?retryWrites=true&w=majority
+
 dotenv.config();
-// process.env.MONGO_URI ||  
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
-mongoose.connect(MONGO_URI)
+ 
+const MONGO_URI = process.env.MONGO_URI  || "mongodb://localhost:27017/CEEDB";
+mongoose.connect(MONGO_URI).then(data => {
+  console.log('connected...');
+})
 
 const app = express();
 
