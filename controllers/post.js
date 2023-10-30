@@ -230,13 +230,14 @@ const searchGroupsAndFriends = async (req, res) => {
     const users = await User.find();
     const groupsAndFriendsData = users.concat(groups);
     const suggestions = groupsAndFriendsData.filter((data) => {
+      console.log(data);
       if(data.groupName) return data;
        else if (
         data.username.includes(searchWord.toLowerCase()) ||
         data.regNumber.includes(searchWord.toLowerCase()) ||
         data.email.includes(searchWord.toLowerCase())
       ) return data;
-      return ;
+      else  return ;
         
     });
 
