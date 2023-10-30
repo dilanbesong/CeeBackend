@@ -13,11 +13,9 @@ import { corsOptions } from "./configue/corsOption.js";
 import { allowedOrigins } from './configue/allowedOrigins.js'
 
 dotenv.config();
- 
-const MONGO_URI = process.env.MONGO_URI  || "mongodb://localhost:27017/CEEDB";
-mongoose.connect(MONGO_URI).then(data => {
-  console.log('connected...');
-})
+ // process.env.MONGO_URI  ||
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
+mongoose.connect(MONGO_URI)
 
 const app = express();
 

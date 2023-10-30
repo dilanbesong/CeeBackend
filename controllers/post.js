@@ -112,7 +112,7 @@ const deletePost = async (req, res) => {
     if(post.poster == poster){
       
       const deletePost = await Post.findByIdAndDelete(postId);
-      console.log();
+
       return res.status(200).send({ msg: "post deleted", deletePost })
     }
     return res.send({ msg: "Unauthorize delete to this post !" })
@@ -229,9 +229,11 @@ const searchGroupsAndFriends = async (req, res) => {
     
     const groups = await Group.find();
     const users = await User.find();
-    const groupsAndFriendsData = users.concat(groups);
+    const groupsAndFriendsData = [ ...users, ...groups ];
     const suggestions = groupsAndFriendsData.filter((data) => {
-      if(data.groupName) return data
+      if(data.groupName){
+         return data;
+      }
       return (
         data.username.includes(searchWord.toLowerCase()) ||
         data.regNumber.includes(searchWord.toLowerCase()) ||
@@ -239,7 +241,7 @@ const searchGroupsAndFriends = async (req, res) => {
       );
     });
 
-    return res.status(200).send(suggestions);
+    return res.status(200).send({ suggestions });
   } catch (error) {
     return res.send({ msg: error.message });
   }
