@@ -232,16 +232,20 @@ const searchGroupsAndFriends = async (req, res) => {
     const groupsAndFriendsData = [ ...users, ...groups ];
     const suggestions = groupsAndFriendsData.filter((data) => {
       if(data.groupName){
+        console.log(data);
          return data;
       }
       else if(data.username || data.regNumber || data.email){
+        console.log(data);
         return (
           data.username.includes(searchWord.toLowerCase()) ||
           data.regNumber.includes(searchWord.toLowerCase()) ||
           data.email.includes(searchWord.toLowerCase())
         );
+      }else{
+         return data;
       }
-      return data
+      
     });
 
     return res.status(200).send({ suggestions });
