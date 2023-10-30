@@ -234,11 +234,14 @@ const searchGroupsAndFriends = async (req, res) => {
       if(data.groupName){
          return data;
       }
-      return (
-        data.username.includes(searchWord.toLowerCase()) ||
-        data.regNumber.includes(searchWord.toLowerCase()) ||
-        data.email.includes(searchWord.toLowerCase())
-      );
+      else if(data.username || data.regNumber || data.email){
+        return (
+          data.username.includes(searchWord.toLowerCase()) ||
+          data.regNumber.includes(searchWord.toLowerCase()) ||
+          data.email.includes(searchWord.toLowerCase())
+        );
+      }
+      return data
     });
 
     return res.status(200).send({ suggestions });
