@@ -112,7 +112,6 @@ const deletePost = async (req, res) => {
     if(post.poster == poster){
       
       const deletePost = await Post.findByIdAndDelete(postId);
-
       return res.status(200).send({ msg: "post deleted", deletePost })
     }
     return res.send({ msg: "Unauthorize delete to this post !" })
@@ -229,23 +228,16 @@ const searchGroupsAndFriends = async (req, res) => {
     
     const groups = await Group.find();
     const users = await User.find();
-    const groupsAndFriendsData = [ ...users, ...groups ];
+    const groupsAndFriendsData = users.concat(groups);
     const suggestions = groupsAndFriendsData.filter((data) => {
-      if(data.groupName){
-        console.log(data);
-         return data;
-      }
-      else if(data.username || data.regNumber || data.email){
-        console.log(data);
-        return (
-          data.username.includes(searchWord.toLowerCase()) ||
-          data.regNumber.includes(searchWord.toLowerCase()) ||
-          data.email.includes(searchWord.toLowerCase())
-        );
-      }else{
-         return data;
-      }
-      
+      if(data.groupName) return data;
+       else if (
+        data.username.includes(searchWord.toLowerCase()) ||
+        data.regNumber.includes(searchWord.toLowerCase()) ||
+        data.email.includes(searchWord.toLowerCase())
+      ) return data;
+      return ;
+        
     });
 
     return res.status(200).send({ suggestions });
