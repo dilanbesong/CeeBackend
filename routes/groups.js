@@ -11,9 +11,9 @@ import {
 const router = express.Router()
  router
    .get("/getGroupPost/:groupId", getGroupPost)
-   .get("/getMyGroups", getMyGroups)
+   .get("/getMyGroups/:myId", getMyGroups)
    .get("/getGroup/:groupId", getGroup)
-   .post("/createGroup", isGroupAdmin, createGroup)
+   .post("/createGroup",  createGroup)
    .put("/joinGroup", joinGroup);
 
 export default router

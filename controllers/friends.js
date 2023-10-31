@@ -36,11 +36,8 @@ const getMyFriendList = async (req, res) => {
 
 const sendFriendOneRequest = async (req, res) => {
   try {
-    const { friendId } = req.body;
-    const myId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    const { friendId, myId } = req.body;
+    
 
    const user = await User.findById(myId)
    const friend = await User.findById(friendId)
@@ -207,11 +204,11 @@ const getMyFriendRequestList = async (req, res) => {
 
 const deleteOneFriend = async ( req, res) => {
      try {
-      const { friendId } = req.params;
-      const myId = await jwt.verify(
-        req.session.userToken,
-        process.env.JWT_SECRETE
-      ).user._id;
+      const { friendId, myId } = req.params;
+      // const myId = await jwt.verify(
+      //   req.session.userToken,
+      //   process.env.JWT_SECRETE
+      // ).user._id;
       const { FriendList } = await User.findById(myId)
        await User.updateOne(
         { _id: friendId },
@@ -230,10 +227,7 @@ const deleteOneFriend = async ( req, res) => {
 }
 const deleteAllFriends = async (req, res) => {
   try {
-    const myId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    const myId = req.params.myId
      const user = await User.findById(myId)
      const users = await User.find()
      await Promise.all( users.map( async({ FriendList, _id }) => {
@@ -283,11 +277,11 @@ const getAllmySentFriendRequest = async ( req, res) => {
 
 const cancelOneSentFriendRequest = async (req, res) => {
   try {
-    const { friendId } = req.body
-    const myId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    const { friendId, myId } = req.body
+    // const myId = await jwt.verify(
+    //   req.session.userToken,
+    //   process.env.JWT_SECRETE
+    // ).user._id;
     
     await User.updateOne(
       { _id: myId },

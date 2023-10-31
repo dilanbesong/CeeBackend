@@ -1,5 +1,5 @@
 import { Group, Post, User } from "../model/schema.js";
-import jwt from "jsonwebtoken";
+
 
 const createGroup = async ( req, res ) => {
   try {
@@ -29,10 +29,7 @@ const getGroup = async(req, res) => {
 
 const getMyGroups = async (req, res) => {
   try {
-    const myId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id
+    const myId = req.params.myId
 
     const { GroupList } = await User.findById(myId)
     const GroupIDs = await Promise.all(
@@ -55,11 +52,8 @@ const getMyGroups = async (req, res) => {
 };
 const joinGroup = async (req, res) => {
   try {
-    const { groupId } = req.body;
-    const myId = await jwt.verify(
-      req.session.userToken,
-      process.env.JWT_SECRETE
-    ).user._id;
+    const { groupId, myId } = req.body;
+    
 
     const user = await User.findById(myId);
     const group = await Group.findById(groupId);
