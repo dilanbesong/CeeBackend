@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 const getMyFriendList = async (req, res) => {
   try {
     const userId = req.params.userId
+    
     // const userId = await jwt.verify(
     //   req.session.userToken,
     //   process.env.JWT_SECRETE

@@ -14,7 +14,7 @@ import { allowedOrigins } from './configue/allowedOrigins.js'
 
 dotenv.config();
  // process.env.MONGO_URI  ||
-const MONGO_URI = "mongodb://localhost:27017/CEEDB";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/CEEDB";
 mongoose.connect(MONGO_URI)
 
 const app = express();
